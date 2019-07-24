@@ -4,41 +4,27 @@ import { User } from './entity/User'
 import { Photo } from './entity/Photo'
 import { PhotoMetadata } from './entity/PhotoMetadata'
 import { Author } from './entity/Author'
+import { Album } from './entity/Album'
 
 createConnection()
   .then(async connection => {
     let photoRepository = connection.getRepository(Photo)
-    let authorRepository = connection.getRepository(Author)
+    let albumRepository = connection.getRepository(Album)
 
-    // create photo object
-    let photo = new Photo()
-    photo.name = 'Me and Bears 123123'
-    photo.description = 'I am near polar bears'
-    photo.filename = 'photo-with-bears.jpg'
-    photo.isPublished = true
-    photo.views = 2
+    // create a few albums
+    let album1 = new Album()
+    album1.name = 'Bears'
+    await albumRepository.save(album1)
 
-    // create photo metadata object
-    let metadata = new PhotoMetadata()
-    metadata.height = 640
-    metadata.width = 480
-    metadata.compressed = true
-    metadata.comment = 'cybershoot -asd--2'
-    metadata.orientation = 'portait'
+    let album2 = new Album()
+    album2.name = 'Me'
+    await albumRepository.save(album2)
 
-    photo.metadata = metadata // this way we connect them
+    let photo = await photoRepository.findOne(1)
+    photo.albums = [album1, album2]
 
-    let author = new Author()
-    author.name = 'xu'
-    await authorRepository.save(author)
-
-    photo.author = author
-
-    // get repository
-
-    // saving a photo also save the metadata
     await photoRepository.save(photo)
 
-    console.log('Photo is saved, photo metadata is saved too.')
+    console.log(await photoRepository.findOne(1, { relations: ['albums'] }))
   })
   .catch(error => console.log(error))

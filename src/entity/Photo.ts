@@ -4,9 +4,11 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   ManyToOne,
+  ManyToMany,
 } from 'typeorm'
 import { PhotoMetadata } from './PhotoMetadata'
 import { Author } from './Author'
+import { Album } from './Album'
 
 @Entity()
 export class Photo {
@@ -37,4 +39,7 @@ export class Photo {
 
   @ManyToOne(type => Author, author => author.photos)
   author: Author
+
+  @ManyToMany(type => Album, album => album.photos)
+  albums: Album[]
 }
